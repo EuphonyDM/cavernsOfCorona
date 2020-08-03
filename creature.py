@@ -1,0 +1,34 @@
+from cmu_112_graphics import *
+import os
+
+class Creature():
+    def __init__(self, app, name, spritePath, hp, row, col):
+        self.name = name
+        self.app = app
+        self.sprite = app.loadImage(spritePath)
+        self.hp = (hp, hp) # current, maximum
+        self.row = row
+        self.col = col
+    
+    def scaleSprite(self, squareLen):
+        if self.sprite.size[0] != squareLen:
+            self.sprite = self.app.scaleImage(self.sprite, squareLen // self.sprite.size[0])
+
+    def move(self, row, col):
+        self.row = row
+        self.col = col
+    
+    def render(self, size, rcs, canvas):
+        squareLen = size / rcs
+        self.scaleSprite(squareLen)
+        x = self.col * squareLen + squareLen / 2
+        y = self.row * squareLen + squareLen / 2
+        canvas.create_image(x, y, image=ImageTk.PhotoImage(self.sprite))
+    
+class Player(Creature):
+    def __init__(self, app, hp, row, col):
+        super().__init__(app, "Player", f"assets{os.sep}1BitPack{os.sep}player.png", hp, row, col)
+
+class Enemy(Creature):
+    def __init__(self, app, name, spritePath, hp, row, col):
+        super().__init__(app, name, spritePath, hp, row, col)
