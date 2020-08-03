@@ -17,8 +17,9 @@ class Item:
         canvas.create_image(x, y, image=ImageTk.PhotoImage(self.sprite))
 
 class Equip(Item):
-    def __init__(self, app, name, spritePath, effects):
+    def __init__(self, app, name, spritePath, effects, slot):
         super().__init__(app, name, spritePath)
+        self.slot = slot
         self.dmg = 0
         self.ac = 0
         self.hp = 0

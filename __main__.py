@@ -8,16 +8,18 @@ class Caverns(ModalApp):
     def appStarted(self):
         self.setSize(640, 480)
         self.player = creature.Player(self, 10, 2, 2)
-        self.addMode(GameMode(name="game"))
-        self.addMode(Inventory(name="inv"))
-        self.setActiveMode('game')
-
-class GameMode(Mode):
-    def appStarted(self):
-        self.player = self.app.player
         self.levels = []
         self.levels.append(level.Level(self, self.player))
         self.currentLevel = 0
+        self.addMode(GameMode(name="game"))
+        self.addMode(Inventory(name="inv"))
+        self.setActiveMode('game')
+        
+class GameMode(Mode):
+    def appStarted(self):
+        self.player = self.app.player
+        self.levels = self.app.levels
+        self.currentLevel = self.app.currentLevel
     
     def keyPressed(self, event):
         if event.key == "i":
@@ -52,6 +54,15 @@ class Inventory(Mode):
         if event.key == "Down":
             if self.selected < 7: self.selected += 1
             elif self.startIndex + 8 < len(self.inv): self.startIndex += 1
+        if event.key == "e":
+            if self.startIndex + self.selected < len(self.inv):
+                item = self.inv[self.startIndex + self.selected]
+                equips = self.app.player.equips
+                if equips.get(item.slot) != None:
+                    self.inv.append(equips[item.slot])
+                equips[item.slot] = item
+                self.inv.pop(self.startIndex + self.selected)
+            self.app.player.updateStats()
     
     def redrawAll(self, canvas):
         height = self.height / 8

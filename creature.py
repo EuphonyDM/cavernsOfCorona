@@ -39,10 +39,10 @@ class Player(Creature):
         self.damage = self.baseDamage
         self.ac = 0
         for slot in self.equips:
-            item = self.equips[slot]
-            if isInstance(item, item.Equip):
-                self.damage += item.dmg
-                self.ac += item.ac
+            wornItem = self.equips[slot]
+            if isinstance(wornItem, item.Equip):
+                self.damage += wornItem.dmg
+                self.ac += wornItem.ac
 
 class Enemy(Creature):
     def __init__(self, app, name, spritePath, hp, row, col):

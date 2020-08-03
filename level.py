@@ -15,7 +15,7 @@ class Level:
 #######"""
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
-        self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5")]
+        self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
         self.player = player
         self.pTurn = True
@@ -69,7 +69,7 @@ class Level:
         canvas.create_rectangle(0, 0, size, size, fill="#220000", width=0)
         for row, col in self.items:
             if not row == self.player.row or not col == self.player.col:
-                for item in self.items[(row, col)]:
+                for item in self.items.get((row, col), []):
                     item.render(row, col, squareLen, canvas)
         for row in range(rcs):
             for col in range(rcs):
