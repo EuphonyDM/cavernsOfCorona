@@ -1,5 +1,6 @@
 from cmu_112_graphics import *
 import os
+import item
 
 class Creature():
     def __init__(self, app, name, spritePath, hp, row, col):
@@ -28,6 +29,20 @@ class Creature():
 class Player(Creature):
     def __init__(self, app, hp, row, col):
         super().__init__(app, "Player", f"assets{os.sep}1BitPack{os.sep}player.png", hp, row, col)
+        self.baseDamage = 3
+        self.damage = 3
+        self.ac = 0
+        self.inventory = []
+        self.equips = dict()
+    
+    def updateStats(self):
+        self.damage = self.baseDamage
+        self.ac = 0
+        for slot in self.equips:
+            item = self.equips[slot]
+            if isInstance(item, item.Equip):
+                self.damage += item.dmg
+                self.ac += item.ac
 
 class Enemy(Creature):
     def __init__(self, app, name, spritePath, hp, row, col):

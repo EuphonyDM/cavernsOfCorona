@@ -1,6 +1,7 @@
 from cmu_112_graphics import *
 import creature
 import os
+import item
 
 class Level:
     def __init__(self, app, player):
@@ -14,6 +15,7 @@ class Level:
 #######"""
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
+        self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5")]
         self.enemies = set()
         self.player = player
         self.pTurn = True
@@ -33,6 +35,11 @@ class Level:
                 if self.tryMove(0, 1):
                     self.pTurn = False
             if event.key == ".":
+                self.pTurn = False
+            if event.key == "g":
+                for item in self.items.get((self.player.row, self.player.col), []):
+                    self.player.inventory.append(item)
+                self.items[(self.player.row, self.player.col)] = []
                 self.pTurn = False
     
     def tryMove(self, dRow, dCol):
@@ -60,6 +67,10 @@ class Level:
         squareLen = size / rcs
         self.scaleSprites(squareLen)
         canvas.create_rectangle(0, 0, size, size, fill="#220000", width=0)
+        for row, col in self.items:
+            if not row == self.player.row or not col == self.player.col:
+                for item in self.items[(row, col)]:
+                    item.render(row, col, squareLen, canvas)
         for row in range(rcs):
             for col in range(rcs):
                 x0 = col * squareLen
