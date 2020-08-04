@@ -144,7 +144,8 @@ def genLevel():
                 break
         if not toBreak:
             levelLines = copyLines
-    for i in range(100):
+    failed = 0
+    while failed < 100:
         room = readFile("rooms"+os.sep+"small.txt")
         lines = room.splitlines()
         row = random.randrange(100-len(lines))
@@ -156,6 +157,7 @@ def genLevel():
                 newR = r + row
                 newC = c + col
                 if not copyLines[newR][newC] == " ":
+                    failed += 1
                     toBreak = True
                     break
                 copyLines[newR] = copyLines[newR][:newC]+lines[r][c]+copyLines[newR][newC+1:]
@@ -190,6 +192,7 @@ def isWall(lines, r, c):
 def makeTunnels(lines):
     rows = len(lines)
     cols = len(lines[0])
+    # .##.
     for row in range(rows):
         for col in range(cols):
             dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
@@ -201,44 +204,50 @@ def makeTunnels(lines):
                         and lines[row+r][col+c] == "#" and lines[row+2*r][col+2*c] == "#"):
                         lines[row+r] = lines[row+r][:col+c]+"."+lines[row+r][col+c+1:]
                         lines[row+2*r] = lines[row+2*r][:col+2*c]+"."+lines[row+2*r][col+2*c+1:]
-    return lines
+    # .# #.
+    for row in range(rows):
+        for col in range(cols):
+            dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+            if lines[row][col] == ".":
+                for r, c in dirs: 
+                    newR = row + 4*r
+                    newC = col + 4*c
+                    if (0 <= newR < rows and 0 <= newC < cols and lines[newR][newC] == "."
+                        and lines[row+r][col+c] == "#" and lines[row+2*r][col+2*c] == " "
+                        and lines[row+3*r][col+3*c] == "#"):
+                        lines[row+r] = lines[row+r][:col+c]+"."+lines[row+r][col+c+1:]
+                        lines[row+2*r] = lines[row+2*r][:col+2*c]+"."+lines[row+2*r][col+2*c+1:]
+                        lines[row+3*r] = lines[row+3*r][:col+3*c]+"."+lines[row+3*r][col+3*c+1:]
+    # .#  #.
+    for row in range(rows):
+        for col in range(cols):
+            dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+            if lines[row][col] == ".":
+                for r, c in dirs: 
+                    newR = row + 5*r
+                    newC = col + 5*c
+                    if (0 <= newR < rows and 0 <= newC < cols and lines[newR][newC] == "."
+                        and lines[row+r][col+c] == "#" and lines[row+2*r][col+2*c] == " "
+                        and lines[row+3*r][col+3*c] == " " and lines[row+4*r][col+4*c] == "#"):
+                        lines[row+r] = lines[row+r][:col+c]+"."+lines[row+r][col+c+1:]
+                        lines[row+2*r] = lines[row+2*r][:col+2*c]+"."+lines[row+2*r][col+2*c+1:]
+                        lines[row+3*r] = lines[row+3*r][:col+3*c]+"."+lines[row+3*r][col+3*c+1:]
+                        lines[row+4*r] = lines[row+4*r][:col+4*c]+"."+lines[row+4*r][col+4*c+1:]
+    return placeWalls(lines)
                     
-
-# def makeTunnel(oldLines, r1, c1):
-#     lines = copy.deepcopy(oldLines)
-#     dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
-#     tunnelDir = None
-#     for dr, dc in dirs:
-#         newr = r1 + dr
-#         newc = c1 + dc
-#         if 0 <= newr < len(lines) and 0 <= newc < len(lines[newr]) and lines[newr][newc] == ".":
-#             tunnelDir = (-1*dr, -1*dc)
-#     if tunnelDir == None:
-#         return oldLines, False
-#     r2 = r1
-#     c2 = c1
-#     while lines[r2][c2] != ".":
-#         r2 += tunnelDir[0]
-#         c2 += tunnelDir[1]
-#         if not (0 <= r2 < len(lines)) or not (0 <= c2 < len(lines[r2])):
-#             return oldLines, False
-#     if abs(r2 - r1) > 5 or abs(c2 - c1) > 5:
-#         return oldLines, False
-#     if tunnelDir[0] != 0:
-#         for r in range(min(r1, r2), max(r1, r2)):
-#             lines[r] = lines[r][:c1]+"."+lines[r][c1+1:]
-#             lines[r] = lines[r][:c1+1]+"#"+lines[r][c1+2:]
-#             lines[r] = lines[r][:c1-1]+"#"+lines[r][c1:]
-#     else: 
-#         for c in range(min(c1, c2), max(c1, c2)):
-#             lines[r1] = lines[r1][:c]+"."+lines[r1][c+1:]
-#             lines[r1+1] = lines[r1+1][:c]+"#"+lines[r1+1][c+1:]
-#             lines[r1-1] = lines[r1-1][:c]+"#"+lines[r1-1][c+1:]
-#     if lines[r1-tunnelDir[0]][c1-tunnelDir[1]] == "#":
-#         lines[r1-tunnelDir[0]] = lines[r1-tunnelDir[0]][:c1-tunnelDir[1]]+"."+lines[r1-tunnelDir[0]][c1-tunnelDir[1]+1:]
-#     if lines[r2+tunnelDir[0]][c2+tunnelDir[1]] == "#":
-#         lines[r2+tunnelDir[0]] = lines[r2+tunnelDir[0]][:c2+tunnelDir[1]]+"."+lines[r2+tunnelDir[0]][c2+tunnelDir[1]+1:]
-#     return copy.deepcopy(lines), True
+def placeWalls(lines):
+    rows = len(lines)
+    cols = len(lines[0])
+    dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+    for row in range(rows):
+        for col in range(cols):
+            if lines[row][col] == " ":
+                for r, c in dirs: 
+                    newR = row + r
+                    newC = col + c
+                    if 0 <= newR < rows and 0 <= newC < cols and lines[newR][newC] == ".":
+                        lines[row] = lines[row][:col]+"#"+lines[row][col+1:]
+    return lines
 
 def getPlayerLoc(lines):
     r = 0

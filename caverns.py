@@ -28,7 +28,7 @@ class GameMode(Mode):
         self.levels[self.currentLevel].timerFired()
     
     def redrawAll(self, canvas):
-            canvas.create_rectangle(self.height, 0, self.width, self.height, fill="black")
+            canvas.create_rectangle(self.height, 0, self.width, self.height, fill="gray16")
             textX = (self.height + self.width) / 2
             canvas.create_text(textX, 40, text=f"HP: {self.player.hp[0]}/{self.player.hp[1]}", fill="white", font="Mono 14")
             canvas.create_text(textX, 80, text=f"Damage: {self.player.damage}", fill="white", font="Mono 14")
