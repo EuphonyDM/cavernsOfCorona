@@ -163,17 +163,7 @@ def genLevel():
                 break
         if not toBreak:
             levelLines = copyLines
-
-    # tunnels = 0
-    # tunnelLocs = set()
-    # while tunnels < 300:
-    #     r = random.randrange(100)
-    #     c = random.randrange(100)
-    #     val = levelLines[r][c]
-    #     if val == "#" and isWall(levelLines, r, c):
-    #         levelLines, b = makeTunnel(levelLines, r, c)
-    #         if b:
-    #             tunnels += 1
+    levelLines = makeTunnels(levelLines)
     pr, pc = getPlayerLoc(levelLines)
     levelStr = ""
     for l in levelLines:
@@ -196,6 +186,23 @@ def isWall(lines, r, c):
             if val == ".":
                 floorCount += 1
     return floorCount == 1
+
+def makeTunnels(lines):
+    rows = len(lines)
+    cols = len(lines[0])
+    for row in range(rows):
+        for col in range(cols):
+            dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+            if lines[row][col] == ".":
+                for r, c in dirs: 
+                    newR = row + 3*r
+                    newC = col + 3*c
+                    if (0 <= newR < rows and 0 <= newC < cols and lines[newR][newC] == "."
+                        and lines[row+r][col+c] == "#" and lines[row+2*r][col+2*c] == "#"):
+                        lines[row+r] = lines[row+r][:col+c]+"."+lines[row+r][col+c+1:]
+                        lines[row+2*r] = lines[row+2*r][:col+2*c]+"."+lines[row+2*r][col+2*c+1:]
+    return lines
+                    
 
 # def makeTunnel(oldLines, r1, c1):
 #     lines = copy.deepcopy(oldLines)
