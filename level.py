@@ -2,6 +2,8 @@ from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/ch
 import creature
 import os
 import item
+import random
+import copy
 
 # These two functions taken from https://www.diderot.one/course/34/chapters/2604/
 
@@ -19,7 +21,7 @@ class Level:
         self.static, pr, pc = genLevel()
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
-        self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
+        # self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
         self.player = player
         self.player.move(pr, pc)
@@ -69,12 +71,12 @@ class Level:
     def getView(self, scrollR, scrollC):
         lines = self.static.splitlines()
         rows = len(lines)
-        cols = 0
-        for i in range(self.player.row - 3, self.player.row + 3):
-            if 0 <= i < len(lines):
-                newCols = len(lines[i])
-                if newCols > cols:
-                    cols = newCols
+        cols = len(lines[self.player.row])
+        # for i in range(self.player.row - 3, self.player.row + 3):
+        #     if 0 <= i < len(lines):
+        #         newCols = len(lines[i])
+        #         if newCols > cols:
+        #             cols = newCols
         result = ""
         for r in range(7):
             for c in range(7):
@@ -118,4 +120,125 @@ class Level:
         self.player.render(size, rcs, 3, 3, canvas)
 
 def genLevel():
-    return (readFile("level2.txt"), 2, 2)
+    failed = 0
+    levelStr = ((" " * 100) + "\n") * 100
+    levelLines = levelStr.splitlines()
+    while failed < 10000: # place rooms
+        n = random.randrange(7) # if I add more rooms, change these two lines
+        room = readFile("rooms"+os.sep+"00"+str(n)+".txt")
+        lines = room.splitlines()
+        row = random.randrange(100-len(lines))
+        col = random.randrange(100-len(lines[0]))
+        copyLines = copy.deepcopy(levelLines)
+        toBreak = False
+        for r in range(len(lines)):
+            for c in range(len(lines[1])):
+                newR = r + row
+                newC = c + col
+                if not copyLines[newR][newC] == " ":
+                    failed += 1
+                    toBreak = True
+                    break
+                copyLines[newR] = copyLines[newR][:newC]+lines[r][c]+copyLines[newR][newC+1:]
+            if toBreak:
+                break
+        if not toBreak:
+            levelLines = copyLines
+    for i in range(100):
+        room = readFile("rooms"+os.sep+"small.txt")
+        lines = room.splitlines()
+        row = random.randrange(100-len(lines))
+        col = random.randrange(100-len(lines[0]))
+        copyLines = copy.deepcopy(levelLines)
+        toBreak = False
+        for r in range(len(lines)):
+            for c in range(len(lines[1])):
+                newR = r + row
+                newC = c + col
+                if not copyLines[newR][newC] == " ":
+                    toBreak = True
+                    break
+                copyLines[newR] = copyLines[newR][:newC]+lines[r][c]+copyLines[newR][newC+1:]
+            if toBreak:
+                break
+        if not toBreak:
+            levelLines = copyLines
+
+    # tunnels = 0
+    # tunnelLocs = set()
+    # while tunnels < 300:
+    #     r = random.randrange(100)
+    #     c = random.randrange(100)
+    #     val = levelLines[r][c]
+    #     if val == "#" and isWall(levelLines, r, c):
+    #         levelLines, b = makeTunnel(levelLines, r, c)
+    #         if b:
+    #             tunnels += 1
+    pr, pc = getPlayerLoc(levelLines)
+    levelStr = ""
+    for l in levelLines:
+        levelStr += l
+        levelStr += "\n"
+    print(levelStr)
+    return (levelStr, pr, pc)
+
+def isWall(lines, r, c):
+    dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+    # wallCount = 0
+    floorCount = 0
+    for dc, dr in dirs:
+        newr = r + dr
+        newc = c + dc
+        if 0 <= newr < len(lines) and 0 <= newc < len(lines[newr]):
+            val = lines[newr][newc]
+            # if val == "#":
+            #     wallCount += 1
+            if val == ".":
+                floorCount += 1
+    return floorCount == 1
+
+# def makeTunnel(oldLines, r1, c1):
+#     lines = copy.deepcopy(oldLines)
+#     dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+#     tunnelDir = None
+#     for dr, dc in dirs:
+#         newr = r1 + dr
+#         newc = c1 + dc
+#         if 0 <= newr < len(lines) and 0 <= newc < len(lines[newr]) and lines[newr][newc] == ".":
+#             tunnelDir = (-1*dr, -1*dc)
+#     if tunnelDir == None:
+#         return oldLines, False
+#     r2 = r1
+#     c2 = c1
+#     while lines[r2][c2] != ".":
+#         r2 += tunnelDir[0]
+#         c2 += tunnelDir[1]
+#         if not (0 <= r2 < len(lines)) or not (0 <= c2 < len(lines[r2])):
+#             return oldLines, False
+#     if abs(r2 - r1) > 5 or abs(c2 - c1) > 5:
+#         return oldLines, False
+#     if tunnelDir[0] != 0:
+#         for r in range(min(r1, r2), max(r1, r2)):
+#             lines[r] = lines[r][:c1]+"."+lines[r][c1+1:]
+#             lines[r] = lines[r][:c1+1]+"#"+lines[r][c1+2:]
+#             lines[r] = lines[r][:c1-1]+"#"+lines[r][c1:]
+#     else: 
+#         for c in range(min(c1, c2), max(c1, c2)):
+#             lines[r1] = lines[r1][:c]+"."+lines[r1][c+1:]
+#             lines[r1+1] = lines[r1+1][:c]+"#"+lines[r1+1][c+1:]
+#             lines[r1-1] = lines[r1-1][:c]+"#"+lines[r1-1][c+1:]
+#     if lines[r1-tunnelDir[0]][c1-tunnelDir[1]] == "#":
+#         lines[r1-tunnelDir[0]] = lines[r1-tunnelDir[0]][:c1-tunnelDir[1]]+"."+lines[r1-tunnelDir[0]][c1-tunnelDir[1]+1:]
+#     if lines[r2+tunnelDir[0]][c2+tunnelDir[1]] == "#":
+#         lines[r2+tunnelDir[0]] = lines[r2+tunnelDir[0]][:c2+tunnelDir[1]]+"."+lines[r2+tunnelDir[0]][c2+tunnelDir[1]+1:]
+#     return copy.deepcopy(lines), True
+
+def getPlayerLoc(lines):
+    r = 0
+    c = 0
+    val = lines[0][0]
+    while val != ".":
+        r+=1
+        c+=1
+        val = lines[r][c]
+    return r, c
