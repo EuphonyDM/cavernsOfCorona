@@ -1,4 +1,4 @@
-from cmu_112_graphics import *
+from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 
 class Item:
     def __init__(self, app, name, spritePath):

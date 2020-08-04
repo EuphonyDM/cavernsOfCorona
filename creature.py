@@ -1,4 +1,4 @@
-from cmu_112_graphics import *
+from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 import os
 import item
 
@@ -19,11 +19,11 @@ class Creature():
         self.row = row
         self.col = col
     
-    def render(self, size, rcs, canvas):
+    def render(self, size, rcs, relR, relC, canvas):
         squareLen = size / rcs
         self.scaleSprite(squareLen)
-        x = self.col * squareLen + squareLen / 2
-        y = self.row * squareLen + squareLen / 2
+        x = relR * squareLen + squareLen / 2
+        y = relC * squareLen + squareLen / 2
         canvas.create_image(x, y, image=ImageTk.PhotoImage(self.sprite))
     
 class Player(Creature):
