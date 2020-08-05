@@ -2,6 +2,7 @@ from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/ch
 import os
 import item
 import random
+import pathfinding
 
 class Creature():
     def __init__(self, app, name, spritePath, hp, dmg, ac, row, col):
@@ -64,16 +65,30 @@ class Enemy(Creature):
     def __init__(self, app, name, spritePath, hp, row, col, dmg, ac):
         super().__init__(app, name, spritePath, hp, dmg, ac, row, col)
         self.damage = dmg
+        self.path = []
     
-    def turn(self, lines):
+    def turn(self, lines, enemies, avail):
+        pr = self.app.player.row
+        pc = self.app.player.col
         dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
         for r, c in dirs:
             newR = self.row + r
             newC = self.col + c
             if (0 <= newR < len(lines) and 0 <= newC < len(lines[newR]) and
-                self.app.player.row == newR and self.app.player.col == newC):
-                print("attacking")
+                pr == newR and pc == newC):
                 self.app.player.damaged(self.damage)
+                return
+        if len(self.path) == 0:
+            self.path = pathfinding.pathfind(avail, self.row, self.col, pr, pc)
+            self.path.pop(0)
+        node = self.path.pop(0)
+        self.move(node[0], node[1])
+    
+    def noEnemies(enemies, r, c):
+        for e in enemies:
+            if e.row == r and e.col == c:
+                return False
+        return True
     
     def checkDead(self):
         if self.hp[0] <= 0: 

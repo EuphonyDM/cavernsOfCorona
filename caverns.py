@@ -1,6 +1,7 @@
 from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 import level
 import creature
+import item
 
 class Caverns(ModalApp):
     def appStarted(self):
@@ -54,18 +55,19 @@ class Inventory(Mode):
             elif self.startIndex + 8 < len(self.inv): self.startIndex += 1
         if event.key == "e":
             if self.startIndex + self.selected < len(self.inv):
-                item = self.inv[self.startIndex + self.selected]
+                chosen = self.inv[self.startIndex + self.selected]
+                if not isinstance(chosen, item.Equip): return
                 equips = self.app.player.equips
-                if equips.get(item.slot) != None:
-                    self.inv.append(equips[item.slot])
-                equips[item.slot] = item
+                if equips.get(chosen.slot) != None:
+                    self.inv.append(equips[chosen.slot])
+                equips[chosen.slot] = chosen
                 self.inv.pop(self.startIndex + self.selected)
             self.app.player.updateStats()
         if event.key == "d":
             if self.startIndex + self.selected < len(self.inv):
-                item = self.inv[self.startIndex + self.selected]
+                chosen = self.inv[self.startIndex + self.selected]
                 level = self.app.levels[self.app.currentLevel]
-                level.items[(self.app.player.row, self.app.player.col)] = level.items.get((self.app.player.row, self.app.player.col), []) + [item]
+                level.items[(self.app.player.row, self.app.player.col)] = level.items.get((self.app.player.row, self.app.player.col), []) + [chosen]
                 self.inv.pop(self.startIndex + self.selected)
     
     def redrawAll(self, canvas):
@@ -81,9 +83,9 @@ class Inventory(Mode):
             else:
                 canvas.create_rectangle(x0, y0, x1, y1, fill=self.color, width=0)
             if self.startIndex + i < len(self.inv):
-                item = self.inv[self.startIndex+i]
+                aItem = self.inv[self.startIndex+i]
                 canvas.create_text(20, (y0 + y1) / 2, text=f"{self.startIndex+i}.", font="Mono 14")
-                canvas.create_text(80, (y0 + y1) / 2, text=item.name, font="Mono 14")
+                canvas.create_text(80, (y0 + y1) / 2, text=aItem.name, font="Mono 14")
             height += self.height / 8
             if self.color == "gray45": self.color = "gray65"
             else: self.color = "gray45"

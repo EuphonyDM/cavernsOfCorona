@@ -4,6 +4,7 @@ import os
 import item
 import random
 import copy
+import pathfinding
 
 # These two functions taken from https://www.diderot.one/course/34/chapters/2604/
 
@@ -18,9 +19,14 @@ def writeFile(path, contents):
 class Level:
     def __init__(self, app, player):
         self.app = app
-        self.static, pr, pc = genLevel()
+        self.static, pr, pc, cr, cc = genLevel()
+        while pathfinding.pathfind(self.notWall, pr, pc, cr, cc) == None:
+            print("generation failed")
+            self.static, pr, pc, cr, cc = genLevel()
+        print(self.static)
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
+        self.items[cr, cc] = [item.Item(self, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}sword.png")]
         # self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
         self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 4, pr, pc+3, 1, 0))
@@ -63,12 +69,37 @@ class Level:
             return True
         return False
     
+    def notWall(self, node):
+        r = node[0]
+        c = node[1]
+        return self.static.splitlines()[r][c] == "."
+
+    def freeSpace(self, node):
+        r = node[0]
+        c = node[1]
+        return self.notWall(node) and self.noEnemies(r, c)
+
+    def noEnemies(self, r, c):
+        for e in self.enemies:
+            if e.row == r and e.col == c:
+                return False
+        return True
+
     def timerFired(self):
         if self.pTurn: return
         for e in self.enemies:
-            e.turn(self.static.splitlines())
+            if self.nearPlayer(e):
+                e.turn(self.static.splitlines(), self.enemies, self.freeSpace)
         self.pTurn = True
     
+    def nearPlayer(self, e):
+        r1 = self.player.row
+        c1 = self.player.col
+        r2 = e.row
+        c2 = e.col
+        dist = ((r2-r1)**2 + (c2-c1)**2) ** 0.5
+        return dist < 10
+
     def scaleSprites(self, squareLen):
         if self.wall.size[0] != squareLen:
             self.wall = self.app.scaleImage(self.wall, squareLen / self.wall.size[0])
@@ -128,7 +159,6 @@ class Level:
             relC = enemy.col - scrollC
             if 0 <= relR < 7 and 0 <= relC < 7:
                 enemy.render(size, rcs, relR, relC, canvas)
-        
 
 def genLevel():
     failed = 0
@@ -178,12 +208,12 @@ def genLevel():
             levelLines = copyLines
     levelLines = makeTunnels(levelLines)
     pr, pc = getPlayerLoc(levelLines)
+    cr, cc = getCrownLoc(levelLines)
     levelStr = ""
     for l in levelLines:
         levelStr += l
         levelStr += "\n"
-    print(levelStr)
-    return (levelStr, pr, pc)
+    return (levelStr, pr, pc, cr, cc)
 
 def isWall(lines, r, c):
     dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
@@ -279,5 +309,15 @@ def getPlayerLoc(lines):
     while val != ".":
         r+=1
         c+=1
+        val = lines[r][c]
+    return r, c
+
+def getCrownLoc(lines):
+    r = 99
+    c = 99
+    val = lines[0][0]
+    while val != ".":
+        r-=1
+        c-=1
         val = lines[r][c]
     return r, c

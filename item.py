@@ -4,11 +4,11 @@ class Item:
     def __init__(self, app, name, spritePath):
         self.app = app
         self.name = name
-        self.sprite = app.loadImage(spritePath)
+        self.sprite = app.app.loadImage(spritePath)
 
     def scaleSprite(self, squareLen):
         if self.sprite.size[0] != squareLen:
-            self.sprite = self.app.scaleImage(self.sprite, squareLen / self.sprite.size[0])
+            self.sprite = self.app.app.scaleImage(self.sprite, squareLen / self.sprite.size[0])
     
     def render(self, row, col, squareLen, canvas):
         self.scaleSprite(squareLen)
