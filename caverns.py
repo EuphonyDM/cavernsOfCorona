@@ -31,7 +31,7 @@ class GameMode(Mode):
             canvas.create_rectangle(self.height, 0, self.width, self.height, fill="gray16")
             textX = (self.height + self.width) / 2
             canvas.create_text(textX, 40, text=f"HP: {self.player.hp[0]}/{self.player.hp[1]}", fill="white", font="Mono 14")
-            canvas.create_text(textX, 80, text=f"Damage: {self.player.damage}", fill="white", font="Mono 14")
+            canvas.create_text(textX, 80, text=f"Damage: {self.player.dmg}", fill="white", font="Mono 14")
             canvas.create_text(textX, 120, text=f"AC: {self.player.ac}", fill="white", font="Mono 14")
             canvas.create_text(textX, self.height - 40, text=f"Row: {self.player.row} Col: {self.player.col}", fill="white", font="Mono 12")
             self.levels[self.currentLevel].render(self.height, canvas)

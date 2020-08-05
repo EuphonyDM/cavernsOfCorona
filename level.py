@@ -23,6 +23,7 @@ class Level:
         self.items = dict()
         # self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
+        self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 4, pr, pc+3, 1, 0))
         self.player = player
         self.player.move(pr, pc)
         self.pTurn = True
@@ -54,6 +55,10 @@ class Level:
         newC = self.player.col + dCol
         lines = self.static.splitlines()
         if lines[newR][newC] == ".":
+            for e in self.enemies:
+                if e.row == newR and e.col == newC:
+                    e.damaged(self.player.dmg)
+                    return True
             self.player.move(newR, newC)
             return True
         return False
@@ -61,7 +66,7 @@ class Level:
     def timerFired(self):
         if self.pTurn: return
         for e in self.enemies:
-            print("e")
+            e.turn(self.static.splitlines())
         self.pTurn = True
     
     def scaleSprites(self, squareLen):
@@ -118,6 +123,12 @@ class Level:
                 if lines[row][col] == " ":
                     canvas.create_rectangle(x0, y0, x1, y1, fill="black")
         self.player.render(size, rcs, 3, 3, canvas)
+        for enemy in self.enemies:
+            relR = enemy.row - scrollR
+            relC = enemy.col - scrollC
+            if 0 <= relR < 7 and 0 <= relC < 7:
+                enemy.render(size, rcs, relR, relC, canvas)
+        
 
 def genLevel():
     failed = 0
@@ -233,6 +244,18 @@ def makeTunnels(lines):
                         lines[row+2*r] = lines[row+2*r][:col+2*c]+"."+lines[row+2*r][col+2*c+1:]
                         lines[row+3*r] = lines[row+3*r][:col+3*c]+"."+lines[row+3*r][col+3*c+1:]
                         lines[row+4*r] = lines[row+4*r][:col+4*c]+"."+lines[row+4*r][col+4*c+1:]
+    # .##.
+    for row in range(rows):
+        for col in range(cols):
+            dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+            if lines[row][col] == ".":
+                for r, c in dirs: 
+                    newR = row + 3*r
+                    newC = col + 3*c
+                    if (0 <= newR < rows and 0 <= newC < cols and lines[newR][newC] == "."
+                        and lines[row+r][col+c] == "#" and lines[row+2*r][col+2*c] == "#"):
+                        lines[row+r] = lines[row+r][:col+c]+"."+lines[row+r][col+c+1:]
+                        lines[row+2*r] = lines[row+2*r][:col+2*c]+"."+lines[row+2*r][col+2*c+1:]
     return placeWalls(lines)
                     
 def placeWalls(lines):

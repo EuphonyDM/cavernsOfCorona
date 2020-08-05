@@ -1,16 +1,31 @@
 from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 import os
 import item
+import random
 
 class Creature():
-    def __init__(self, app, name, spritePath, hp, row, col):
+    def __init__(self, app, name, spritePath, hp, dmg, ac, row, col):
         self.name = name
         self.app = app
         self.sprite = app.loadImage(spritePath)
+        self.basehp = hp
         self.hp = (hp, hp) # current, maximum
+        self.basedmg = dmg
+        self.dmg = dmg
+        self.baseac = ac
+        self.ac = ac
         self.row = row
         self.col = col
     
+    def damaged(self, damage):
+        blocked = random.randint(0, self.ac)
+        self.hp = (self.hp[0] - (damage - blocked), self.hp[1])
+        if self.hp[0] <= 0: 
+            self.checkDead()
+    
+    def checkDead(self):
+        return
+
     def scaleSprite(self, squareLen):
         if self.sprite.size[0] != squareLen:
             self.sprite = self.app.scaleImage(self.sprite, squareLen // self.sprite.size[0])
@@ -22,18 +37,19 @@ class Creature():
     def render(self, size, rcs, relR, relC, canvas):
         squareLen = size / rcs
         self.scaleSprite(squareLen)
-        x = relR * squareLen + squareLen / 2
-        y = relC * squareLen + squareLen / 2
+        x = relC * squareLen + squareLen / 2
+        y = relR * squareLen + squareLen / 2
         canvas.create_image(x, y, image=ImageTk.PhotoImage(self.sprite))
     
 class Player(Creature):
     def __init__(self, app, hp, row, col):
-        super().__init__(app, "Player", f"assets{os.sep}1BitPack{os.sep}player.png", hp, row, col)
-        self.baseDamage = 3
-        self.damage = 3
-        self.ac = 0
+        super().__init__(app, "Player", f"assets{os.sep}1BitPack{os.sep}player.png", hp, 3, 0, row, col)
         self.inventory = []
         self.equips = dict()
+    
+    def checkDead(self):
+        if self.hp[0] <= 0: 
+            self.app.setActiveMode("gameover")
     
     def updateStats(self):
         self.damage = self.baseDamage
@@ -45,5 +61,20 @@ class Player(Creature):
                 self.ac += wornItem.ac
 
 class Enemy(Creature):
-    def __init__(self, app, name, spritePath, hp, row, col):
-        super().__init__(app, name, spritePath, hp, row, col)
+    def __init__(self, app, name, spritePath, hp, row, col, dmg, ac):
+        super().__init__(app, name, spritePath, hp, dmg, ac, row, col)
+        self.damage = dmg
+    
+    def turn(self, lines):
+        dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
+        for r, c in dirs:
+            newR = self.row + r
+            newC = self.col + c
+            if (0 <= newR < len(lines) and 0 <= newC < len(lines[newR]) and
+                self.app.player.row == newR and self.app.player.col == newC):
+                print("attacking")
+                self.app.player.damaged(self.damage)
+    
+    def checkDead(self):
+        if self.hp[0] <= 0: 
+            self.app.levels[self.app.currentLevel].enemies.remove(self)
