@@ -3,6 +3,7 @@ import os
 import item
 import random
 import pathfinding
+import level
 
 class Creature():
     def __init__(self, app, name, spritePath, hp, dmg, ac, row, col):
@@ -79,7 +80,7 @@ class Enemy(Creature):
                 self.app.player.damaged(self.damage)
                 return
         if len(self.path) == 0:
-            self.path = pathfinding.pathfind(avail, self.row, self.col, pr, pc)
+            self.path = pathfinding.pathfind(avail, self.row, self.col, pr, pc)[:4]
             self.path.pop(0)
         node = self.path.pop(0)
         self.move(node[0], node[1])

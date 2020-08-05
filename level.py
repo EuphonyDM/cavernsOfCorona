@@ -26,14 +26,23 @@ class Level:
         print(self.static)
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
-        self.items[cr, cc] = [item.Item(self, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}sword.png")]
+        self.items[cr, cc] = [item.Item(self, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}crown.png")]
         # self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
-        self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 4, pr, pc+3, 1, 0))
+        self.genEnemies(20)
         self.player = player
         self.player.move(pr, pc)
         self.pTurn = True
     
+    def genEnemies(self, num):
+        spawned = 0
+        while spawned < num:
+            r = random.randrange(100)
+            c = random.randrange(100)
+            if self.freeSpace((r,c)):
+                spawned += 1
+                self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 4, r, c, 1, 0))
+
     def keyPressed(self, event):
         if self.pTurn:
             if event.key == "Up": 
