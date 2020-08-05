@@ -50,7 +50,7 @@ class Player(Creature):
     
     def checkDead(self):
         if self.hp[0] <= 0: 
-            self.app.setActiveMode("gameover")
+            self.app.setActiveMode("lose")
     
     def updateStats(self):
         self.damage = self.baseDamage

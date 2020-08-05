@@ -12,6 +12,8 @@ class Caverns(ModalApp):
         self.currentLevel = 0
         self.addMode(GameMode(name="game"))
         self.addMode(Inventory(name="inv"))
+        self.addMode(Win(name="win"))
+        self.addMode(Lose(name="lose"))
         self.setActiveMode('game')
         
 class GameMode(Mode):
@@ -85,8 +87,18 @@ class Inventory(Mode):
             if self.startIndex + i < len(self.inv):
                 aItem = self.inv[self.startIndex+i]
                 canvas.create_text(20, (y0 + y1) / 2, text=f"{self.startIndex+i}.", font="Mono 14")
-                canvas.create_text(80, (y0 + y1) / 2, text=aItem.name, font="Mono 14")
+                canvas.create_text(120, (y0 + y1) / 2, text=aItem.name, font="Mono 14")
             height += self.height / 8
             if self.color == "gray45": self.color = "gray65"
             else: self.color = "gray45"
             i += 1
+
+class Win(Mode):
+    def redrawAll(self, canvas):
+        canvas.create_rectangle(0, 0, self.width, self.height, fill="black")
+        canvas.create_text(self.width / 2, self.height/2, text="You win!", font="Mono 32", fill="white")
+
+class Lose(Mode):
+    def redrawAll(self, canvas):
+        canvas.create_rectangle(0, 0, self.width, self.height, fill="black")
+        canvas.create_text(self.width / 2, self.height/2, text="You lose :(", font="Mono 32", fill="white")

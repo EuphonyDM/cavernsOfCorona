@@ -86,7 +86,11 @@ class Level:
         return True
 
     def timerFired(self):
-        if self.pTurn: return
+        if self.pTurn: 
+            for i in self.player.inventory:
+                if i.name == "Crystal Crown":
+                    self.app.setActiveMode("win")
+            return
         for e in self.enemies:
             if self.nearPlayer(e):
                 e.turn(self.static.splitlines(), self.enemies, self.freeSpace)
