@@ -32,3 +32,7 @@ class Equip(Item):
                 self.ac += power
             if effectType == "h":
                 self.hp += power
+
+def genItem(app, name):
+    if name == "Crown":
+        return Item(app, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}crown.png")

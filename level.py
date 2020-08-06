@@ -26,7 +26,7 @@ class Level:
         print(self.static)
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
-        self.items[cr, cc] = [item.Item(self, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}crown.png")]
+        self.items[cr, cc] = [item.genItem(self,"crown")]
         # self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
         self.genEnemies(20)
