@@ -27,9 +27,11 @@ class Level:
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
         self.items[cr, cc] = [item.genItem(self,"crown")]
-        # self.items[(1, 3)] = [item.Equip(self.app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")]
         self.enemies = set()
         self.genEnemies(20)
+        self.genItems("Sword", 5)
+        self.genItems("Helmet", 5)
+        self.genItems("Health Ring", 5)
         self.player = player
         self.player.move(pr, pc)
         self.pTurn = True
@@ -42,6 +44,17 @@ class Level:
             if self.freeSpace((r,c)):
                 spawned += 1
                 self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 4, r, c, 1, 0))
+    
+    def genItems(self, name, num):
+        spawned = 0
+        while spawned < num:
+            r = random.randrange(100)
+            c = random.randrange(100)
+            if self.freeSpace((r,c)):
+                spawned += 1
+                locList = self.items.get((r, c), [])
+                locList.append(item.genItem(self, name))
+                self.items[(r, c)] = locList
 
     def keyPressed(self, event):
         if self.pTurn:

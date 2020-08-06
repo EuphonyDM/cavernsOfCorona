@@ -21,7 +21,9 @@ class Creature():
     
     def damaged(self, damage):
         blocked = random.randint(0, self.ac)
-        self.hp = (self.hp[0] - (damage - blocked), self.hp[1])
+        updatedDamage = damage - blocked
+        if updatedDamage < 0: updatedDamage = 0
+        self.hp = (self.hp[0] - (updatedDamage), self.hp[1])
         if self.hp[0] <= 0: 
             self.checkDead()
     
@@ -54,12 +56,12 @@ class Player(Creature):
             self.app.setActiveMode("lose")
     
     def updateStats(self):
-        self.damage = self.baseDamage
+        self.dmg = self.basedmg
         self.ac = 0
         for slot in self.equips:
             wornItem = self.equips[slot]
             if isinstance(wornItem, item.Equip):
-                self.damage += wornItem.dmg
+                self.dmg += wornItem.dmg
                 self.ac += wornItem.ac
 
 class Enemy(Creature):
