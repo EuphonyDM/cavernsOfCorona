@@ -29,9 +29,11 @@ class Level:
         self.items[(cr, cc)] = [item.genItem(self,"Crown")]
         self.enemies = set()
         self.genEnemies(20)
-        self.genItems("Sword", 10)
-        self.genItems("Helmet", 10)
-        self.genItems("Health Ring", 10)
+        self.genItems("Sword", 5)
+        self.genItems("Helmet", 5)
+        self.genItems("Health Ring", 5)
+        self.genItems("Health Pot", 10)
+        self.genItems("Sharpening Kit", 10)
         self.player = player
         self.player.move(pr, pc)
         self.pTurn = True
@@ -109,7 +111,7 @@ class Level:
 
     def timerFired(self):
         if self.pTurn: 
-            self.app.turns += 1
+            self.player.updateStats
             for i in self.player.inventory:
                 if i.name == "Crystal Crown":
                     self.app.setActiveMode("win")
@@ -117,6 +119,14 @@ class Level:
         for e in self.enemies:
             if self.nearPlayer(e):
                 e.turn(self.static.splitlines(), self.enemies, self.freeSpace)
+        self.app.turns += 1
+        newEffects = []
+        for e0, e1 in self.player.effects:
+            e1 -= 1
+            if e1 != 0:
+                newEffects.append((e0, e1))
+        self.player.effects = newEffects
+        self.player.updateStats()
         self.pTurn = True
     
     def nearPlayer(self, e):

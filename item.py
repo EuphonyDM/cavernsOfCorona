@@ -33,6 +33,25 @@ class Equip(Item):
             if effectType == "h":
                 self.hp += power
 
+class Consumable(Item):
+    def __init__(self, app, name, spritePath, effects):
+        super().__init__(app, name, spritePath)
+        self.effects = effects.split(",")
+    
+    def use(self, player):
+        for effect in self.effects:
+            e0 = effect[0]
+            if e0 == "h":
+                hp, mhp = player.hp
+                hp += int(effect[1:])
+                if hp > mhp: hp = mhp
+                player.hp = (hp, mhp)
+            if e0 == "d":
+                self.app.player.effects.append((effect[:3], int(effect[3:])))
+                self.app.player.updateStats
+                
+
+
 def genItem(app, name):
     if name == "Crown":
         return Item(app, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}crown.png")
@@ -42,3 +61,7 @@ def genItem(app, name):
         return Equip(app, "Helmet", f"assets{os.sep}1BitPack{os.sep}helmet.png", "a2", "head")
     if name == "Health Ring":
         return Equip(app, "Ring of Health", f"assets{os.sep}1BitPack{os.sep}ring.png", "h5", "ring")
+    if name == "Health Pot":
+        return Consumable(app, "Health Potion", f"assets{os.sep}1BitPack{os.sep}potion.png", "h5")
+    if name == "Sharpening Kit":
+        return Consumable(app, "Sharpening Kit", f"assets{os.sep}1BitPack{os.sep}kit.png", "d0210")

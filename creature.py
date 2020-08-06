@@ -50,6 +50,7 @@ class Player(Creature):
         super().__init__(app, "Player", f"assets{os.sep}1BitPack{os.sep}player.png", hp, 3, 0, row, col)
         self.inventory = []
         self.equips = dict()
+        self.effects = []
     
     def checkDead(self):
         if self.hp[0] <= 0: 
@@ -66,6 +67,9 @@ class Player(Creature):
                 self.ac += wornItem.ac
                 maxhp += wornItem.hp
         self.hp = (self.hp[0] + (maxhp - self.hp[1]), maxhp)
+        for effect in self.effects:
+            if effect[0][0] == "d":
+                self.dmg += int(effect[0][1:])
 
 
 class Enemy(Creature):

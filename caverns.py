@@ -11,12 +11,24 @@ class Caverns(ModalApp):
         self.levels.append(level.Level(self, self.player))
         self.currentLevel = 0
         self.turns = 0
+        self.addMode(StartMode(name="start"))
         self.addMode(GameMode(name="game"))
         self.addMode(Inventory(name="inv"))
         self.addMode(Win(name="win"))
         self.addMode(Lose(name="lose"))
-        self.setActiveMode('game')
-        
+        self.setActiveMode('start')
+
+class StartMode(Mode):
+    def start(self):
+        self.setActiveMode("game")
+    
+    def redrawAll(self, canvas):
+        canvas.create_rectangle(0, 0, self.width, self.height, fill="#220000")
+        canvas.create_text(self.width / 2, self.height/2 - 60, text="Caverns of Corona", font="Mono 32", fill="white")
+        canvas.create_rectangle(self.width / 2 - 100, self.height / 2, self.width / 2 + 100, self.height / 2 + 60, 
+                                fill="white", width=0, onClick=self.start)
+        canvas.create_text(self.width/2, self.height/2 + 30, text="New Game", font="Mono 20", fill="black")
+
 class GameMode(Mode):
     def appStarted(self):
         self.player = self.app.player
@@ -66,6 +78,12 @@ class Inventory(Mode):
                 equips[chosen.slot] = chosen
                 self.inv.pop(self.startIndex + self.selected)
             self.app.player.updateStats()
+        if event.key == "u":
+            if self.startIndex + self.selected < len(self.inv):
+                chosen = self.inv[self.startIndex + self.selected]
+                if not isinstance(chosen, item.Consumable): return
+                chosen.use(self.app.player)
+                self.inv.pop(self.startIndex + self.selected)
         if event.key == "d":
             if self.startIndex + self.selected < len(self.inv):
                 chosen = self.inv[self.startIndex + self.selected]
