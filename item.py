@@ -37,7 +37,7 @@ def genItem(app, name):
     if name == "Crown":
         return Item(app, "Crystal Crown", f"assets{os.sep}1BitPack{os.sep}crown.png")
     if name == "Sword":
-        return Equip(app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d5", "main")
+        return Equip(app, "Sword", f"assets{os.sep}1BitPack{os.sep}sword.png", "d3", "main")
     if name == "Helmet":
         return Equip(app, "Helmet", f"assets{os.sep}1BitPack{os.sep}helmet.png", "a2", "head")
     if name == "Health Ring":

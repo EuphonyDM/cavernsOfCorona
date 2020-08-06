@@ -31,7 +31,7 @@ class Level:
         self.genEnemies(20)
         self.genItems("Sword", 5)
         self.genItems("Helmet", 5)
-        self.genItems("Health Ring", 5)
+        self.genItems("Health Ring", 25)
         self.player = player
         self.player.move(pr, pc)
         self.pTurn = True
@@ -43,7 +43,7 @@ class Level:
             c = random.randrange(100)
             if self.freeSpace((r,c)):
                 spawned += 1
-                self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 4, r, c, 1, 0))
+                self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 8, r, c, 2, 0))
     
     def genItems(self, name, num):
         spawned = 0
