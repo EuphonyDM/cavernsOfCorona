@@ -228,21 +228,6 @@ def genLevel():
         levelStr += "\n"
     return (levelStr, pr, pc, cr, cc)
 
-def isWall(lines, r, c):
-    dirs = [(0,1), (1, 0), (0, -1), (-1, 0)]
-    # wallCount = 0
-    floorCount = 0
-    for dc, dr in dirs:
-        newr = r + dr
-        newc = c + dc
-        if 0 <= newr < len(lines) and 0 <= newc < len(lines[newr]):
-            val = lines[newr][newc]
-            # if val == "#":
-            #     wallCount += 1
-            if val == ".":
-                floorCount += 1
-    return floorCount == 1
-
 def makeTunnels(lines):
     rows = len(lines)
     cols = len(lines[0])
