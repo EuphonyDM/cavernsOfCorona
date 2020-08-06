@@ -79,11 +79,15 @@ class Enemy(Creature):
                 pr == newR and pc == newC):
                 self.app.player.damaged(self.damage)
                 return
-        if len(self.path) == 0:
-            self.path = pathfinding.pathfind(avail, self.row, self.col, pr, pc)[:4]
-            self.path.pop(0)
-        node = self.path.pop(0)
-        self.move(node[0], node[1])
+        if self.path == None or len(self.path) == 0:
+            self.path = pathfinding.pathfind(avail, self.row, self.col, pr, pc)
+            if self.path != None:
+                if len(self.path) > 4:
+                    self.path = self.path[:4]
+                self.path.pop(0)
+        if self.path != None:
+            node = self.path.pop(0)
+            self.move(node[0], node[1])
     
     def noEnemies(enemies, r, c):
         for e in enemies:
