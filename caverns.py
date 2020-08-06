@@ -10,6 +10,7 @@ class Caverns(ModalApp):
         self.levels = []
         self.levels.append(level.Level(self, self.player))
         self.currentLevel = 0
+        self.turns = 0
         self.addMode(GameMode(name="game"))
         self.addMode(Inventory(name="inv"))
         self.addMode(Win(name="win"))
@@ -96,9 +97,11 @@ class Inventory(Mode):
 class Win(Mode):
     def redrawAll(self, canvas):
         canvas.create_rectangle(0, 0, self.width, self.height, fill="black")
-        canvas.create_text(self.width / 2, self.height/2, text="You win!", font="Mono 32", fill="white")
+        canvas.create_text(self.width / 2, self.height/2 - 20, text="You win!", font="Mono 32", fill="white")
+        canvas.create_text(self.width / 2, self.height/2 + 20, text=f"Turns taken: {self.app.turns}", font="Mono 32", fill="white")
 
 class Lose(Mode):
     def redrawAll(self, canvas):
         canvas.create_rectangle(0, 0, self.width, self.height, fill="black")
-        canvas.create_text(self.width / 2, self.height/2, text="You lose :(", font="Mono 32", fill="white")
+        canvas.create_text(self.width / 2, self.height/2 - 20, text="You lose :(", font="Mono 32", fill="white")
+        canvas.create_text(self.width / 2, self.height/2 + 20, text=f"Turns taken: {self.app.turns}", font="Mono 32", fill="white")

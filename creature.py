@@ -58,14 +58,15 @@ class Player(Creature):
     def updateStats(self):
         self.dmg = self.basedmg
         self.ac = self.baseac
+        maxhp = self.basehp
         for slot in self.equips:
             wornItem = self.equips[slot]
             if isinstance(wornItem, item.Equip):
                 self.dmg += wornItem.dmg
                 self.ac += wornItem.ac
-                newMaxHP = self.basehp + wornItem.hp
-                hpIncrease = newMaxHP - self.hp[1]
-                self.hp = (self.hp[0]+hpIncrease, newMaxHP)
+                maxhp += wornItem.hp
+        self.hp = (self.hp[0] + (maxhp - self.hp[1]), maxhp)
+
 
 class Enemy(Creature):
     def __init__(self, app, name, spritePath, hp, row, col, dmg, ac):

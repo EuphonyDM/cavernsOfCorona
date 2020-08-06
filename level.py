@@ -26,12 +26,12 @@ class Level:
         print(self.static)
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
         self.items = dict()
-        self.items[cr, cc] = [item.genItem(self,"crown")]
+        self.items[(cr, cc)] = [item.genItem(self,"Crown")]
         self.enemies = set()
         self.genEnemies(20)
-        self.genItems("Sword", 5)
-        self.genItems("Helmet", 5)
-        self.genItems("Health Ring", 25)
+        self.genItems("Sword", 10)
+        self.genItems("Helmet", 10)
+        self.genItems("Health Ring", 10)
         self.player = player
         self.player.move(pr, pc)
         self.pTurn = True
@@ -109,6 +109,7 @@ class Level:
 
     def timerFired(self):
         if self.pTurn: 
+            self.app.turns += 1
             for i in self.player.inventory:
                 if i.name == "Crystal Crown":
                     self.app.setActiveMode("win")
@@ -162,11 +163,11 @@ class Level:
         canvas.create_rectangle(0, 0, size, size, fill="#220000", width=0)
         for row, col in self.items:
             if not row == self.player.row or not col == self.player.col:
-                for item in self.items.get((row, col), []):
+                for i in self.items.get((row, col), []):
                     newR = row - scrollR
                     newC = col - scrollC
                     if 0 <= newR < 7 and 0 <= newC < 7:
-                        item.render(newR, newC, squareLen, canvas)
+                        i.render(newR, newC, squareLen, canvas)
         for row in range(rcs):
             for col in range(rcs):
                 x0 = col * squareLen
