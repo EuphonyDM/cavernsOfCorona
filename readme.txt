@@ -1,0 +1,1 @@
+To run Caverns of Corona, clone the repository and run __main__.py
