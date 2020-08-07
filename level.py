@@ -27,9 +27,12 @@ class Level:
             self.static, pr, pc, cr, cc = genLevel()
         print(self.static)
         self.wall = app.loadImage(f"assets{os.sep}1BitPack{os.sep}wall.png")
+        self.trap = app.loadImage(f"assets{os.sep}1BitPack{os.sep}trap.png")
         self.items = dict()
         self.items[(cr, cc)] = [item.genItem(self,"Crown")]
         self.enemies = set()
+        self.traps = set()
+        self.genTraps(50)
         self.genEnemies(20)
         self.genItems("Sword", 5)
         self.genItems("Helmet", 5)
@@ -40,6 +43,16 @@ class Level:
         self.player.move(pr, pc)
         self.pTurn = True
     
+    def genTraps(self, num):
+        spawned = 0
+        while spawned < num:
+            r = random.randrange(100)
+            c = random.randrange(100)
+            if self.freeSpace((r,c)):
+                spawned += 1
+                self.traps.add((r,c))
+                print(r,c)
+
     def genEnemies(self, num):
         spawned = 0
         while spawned < num:
@@ -103,7 +116,7 @@ class Level:
     def freeSpace(self, node):
         r = node[0]
         c = node[1]
-        return self.notWall(node) and self.noEnemies(r, c)
+        return self.notWall(node) and self.noEnemies(r, c) and node not in self.traps
 
     def noEnemies(self, r, c):
         for e in self.enemies:
@@ -142,6 +155,8 @@ class Level:
     def scaleSprites(self, squareLen):
         if self.wall.size[0] != squareLen:
             self.wall = self.app.scaleImage(self.wall, squareLen / self.wall.size[0])
+        if self.trap.size[0] != squareLen:
+            self.trap = self.app.scaleImage(self.trap, squareLen / self.trap.size[0])
 
     def getView(self, scrollR, scrollC):
         lines = self.static.splitlines()
@@ -173,6 +188,7 @@ class Level:
         squareLen = size / rcs
         self.scaleSprites(squareLen)
         canvas.create_rectangle(0, 0, size, size, fill="#220000", width=0)
+
         for row, col in self.items:
             if not row == self.player.row or not col == self.player.col:
                 for i in self.items.get((row, col), []):
@@ -180,6 +196,7 @@ class Level:
                     newC = col - scrollC
                     if 0 <= newR < 7 and 0 <= newC < 7:
                         i.render(newR, newC, squareLen, canvas)
+
         for row in range(rcs):
             for col in range(rcs):
                 x0 = col * squareLen
@@ -192,7 +209,22 @@ class Level:
                     canvas.create_image(x, y, image=ImageTk.PhotoImage(self.wall))
                 if lines[row][col] == " ":
                     canvas.create_rectangle(x0, y0, x1, y1, fill="black")
+        
+        for row, col in self.traps:
+            if not row == self.player.row or not col == self.player.col:
+                newR = row - scrollR
+                newC = col - scrollC
+                if 0 <= newR < 7 and 0 <= newC < 7:
+                    x0 = newC * squareLen
+                    y0 = newR * squareLen
+                    x1 = x0 + squareLen
+                    y1 = y0 + squareLen
+                    x = (x0 + x1) / 2
+                    y = (y0 + y1) / 2
+                    canvas.create_image(x, y, image=ImageTk.PhotoImage(self.trap))
+
         self.player.render(size, rcs, 3, 3, canvas)
+
         for enemy in self.enemies:
             relR = enemy.row - scrollR
             relC = enemy.col - scrollC
