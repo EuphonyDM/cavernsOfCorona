@@ -44,13 +44,12 @@ Level generation will take place by repeatedly choosing from a set of premade ro
 - Map generation
 	- Premade rooms
 	- Connection algorithm
-- Add additional enemies and items
 
 ### TP3
-- Basic story
-- Character creation
- - Multiple classes offer different starting equipment
- - Races give unique passive effects
+- Add many new items
+	- Some are consumable, with temporary effects
+- Add a short-range teleportation ability
+- Add traps in the floor to use the enemies' pathfinding against them
  
 ## Version Control
 I am using Github for my documentation. See my project at: [github.com/EuphonyDM/cavernsOfCorona](https://github.com/EuphonyDM/cavernsOfCorona). 
@@ -61,3 +60,6 @@ I am using Github for my documentation. See my project at: [github.com/EuphonyDM
 
 ## TP2 Update
 I removed references to the town and shop, as I will no longer be implementing these features. 
+
+## TP3 Update
+I updated the TP3 section of the timeline to better reflect my goals. 
