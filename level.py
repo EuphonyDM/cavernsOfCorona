@@ -1,3 +1,5 @@
+# Contains the Level class which most of the game is played in
+
 from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 import creature
 import os

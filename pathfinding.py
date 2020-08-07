@@ -1,3 +1,5 @@
+# Contains the pathfinding algorithim used by the enemies and to confirm that a generated level is valid
+# The algorithim used is a greedy best first search, which prioritizes spaces closer to the goal
 
 def pathfind(avail, sr, sc, gr, gc):
     openList = []

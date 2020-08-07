@@ -1,3 +1,6 @@
+# Contains the Creature class and its two subclasses Player and Enemy
+# All creatures have health, damage, AC, and their location
+
 from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 import os
 import item

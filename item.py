@@ -1,3 +1,7 @@
+# Contains the Item class and its two subclasses Equip and Consumable
+# All items can be put in the inventory
+# Items do not store their own location because of this
+
 from cmu_112_graphics import * # taken from https://www.diderot.one/course/34/chapters/2847/
 
 class Item:
