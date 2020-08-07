@@ -133,6 +133,9 @@ class Level:
                 if i.name == "Crystal Crown":
                     self.app.setActiveMode("win")
             return
+        for e in self.toKill:
+            self.enemies.remove(e)
+        self.toKill = []
         for e in self.enemies:
             if self.nearPlayer(e):
                 e.turn(self.static.splitlines(), self.enemies, self.freeSpace)

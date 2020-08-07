@@ -68,4 +68,4 @@ def genItem(app, name):
     if name == "Health Pot":
         return Consumable(app, "Health Potion", f"assets{os.sep}1BitPack{os.sep}potion.png", "h5")
     if name == "Sharpening Kit":
-        return Consumable(app, "Sharpening Kit", f"assets{os.sep}1BitPack{os.sep}kit.png", "d0210")
+        return Consumable(app, "Sharpening Kit", f"assets{os.sep}1BitPack{os.sep}kit.png", "d0310")

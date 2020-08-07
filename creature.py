@@ -109,5 +109,5 @@ class Enemy(Creature):
         return True
     
     def checkDead(self):
-        if self.hp[0] <= 0: 
+        if self.hp[0] < 1: 
             self.app.levels[self.app.currentLevel].toKill.append(self)
