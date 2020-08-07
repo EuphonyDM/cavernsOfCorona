@@ -31,6 +31,7 @@ class Level:
         self.items = dict()
         self.items[(cr, cc)] = [item.genItem(self,"Crown")]
         self.enemies = set()
+        self.toKill = []
         self.traps = set()
         self.genTraps(50)
         self.genEnemies(20)
@@ -48,17 +49,16 @@ class Level:
         while spawned < num:
             r = random.randrange(100)
             c = random.randrange(100)
-            if self.freeSpace((r,c)):
+            if self.freeSpace((r,c)) and (r,c) not in self.traps:
                 spawned += 1
                 self.traps.add((r,c))
-                print(r,c)
 
     def genEnemies(self, num):
         spawned = 0
         while spawned < num:
             r = random.randrange(100)
             c = random.randrange(100)
-            if self.freeSpace((r,c)):
+            if self.freeSpace((r,c)) and (r,c) not in self.traps:
                 spawned += 1
                 self.enemies.add(creature.Enemy(self.app, "e", f"assets{os.sep}1BitPack{os.sep}enemy.png", 8, r, c, 2, 0))
     
@@ -67,7 +67,7 @@ class Level:
         while spawned < num:
             r = random.randrange(100)
             c = random.randrange(100)
-            if self.freeSpace((r,c)):
+            if self.freeSpace((r,c)) and (r,c) not in self.traps:
                 spawned += 1
                 locList = self.items.get((r, c), [])
                 locList.append(item.genItem(self, name))
@@ -105,6 +105,8 @@ class Level:
                     e.damaged(self.player.dmg)
                     return True
             self.player.move(newR, newC)
+            if (newR, newC) in self.traps:
+                self.player.damaged(2)
             return True
         return False
     
@@ -116,7 +118,7 @@ class Level:
     def freeSpace(self, node):
         r = node[0]
         c = node[1]
-        return self.notWall(node) and self.noEnemies(r, c) and node not in self.traps
+        return self.notWall(node) and self.noEnemies(r, c)
 
     def noEnemies(self, r, c):
         for e in self.enemies:
@@ -134,6 +136,11 @@ class Level:
         for e in self.enemies:
             if self.nearPlayer(e):
                 e.turn(self.static.splitlines(), self.enemies, self.freeSpace)
+                if (e.row, e.col) in self.traps:
+                    e.damaged(2)
+        for e in self.toKill:
+            self.enemies.remove(e)
+        self.toKill = []
         self.app.turns += 1
         newEffects = []
         for e0, e1 in self.player.effects:

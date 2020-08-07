@@ -110,4 +110,4 @@ class Enemy(Creature):
     
     def checkDead(self):
         if self.hp[0] <= 0: 
-            self.app.levels[self.app.currentLevel].enemies.remove(self)
+            self.app.levels[self.app.currentLevel].toKill.append(self)
